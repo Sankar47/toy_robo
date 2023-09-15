@@ -2,6 +2,7 @@
 class Robot
     @@can_robot_start = false
     @@directions_arr = ["NORTH", "EAST", "SOUTH", "WEST"]
+    @@space_flag = false
 
     def initialize
         @x_coordinate = nil
@@ -17,7 +18,7 @@ class Robot
         while robot_command.downcase != "q"
             print "Enter a command (type 'q' to quit): "
             robot_command = gets.chomp
-            robot_command_split = robot_command.split
+            robot_command_split = robot_command.split(' ', 2)
             @@can_robot_start = true if robot_command_split[0] == "PLACE"
 
             if @@can_robot_start
@@ -42,7 +43,14 @@ class Robot
         if valid_position?(arr[0].to_i, arr[1].to_i)
             @x_coordinate = arr[0].to_i
             @y_coordinate = arr[1].to_i
-            @direction = arr[2]
+            @direction = arr[2].strip
+
+            #Checking whether input has space before direction field
+            if arr[2].strip != arr[2]
+                @@space_flag = true
+            else
+                @@space_flag = false
+            end
         end
     end
 
@@ -73,7 +81,12 @@ class Robot
     def report
         #Checking for valid PLACE command
         if @@can_robot_start && (@x_coordinate && @y_coordinate) && valid_direction?(@direction)
-            puts "#{@x_coordinate},#{@y_coordinate},#{@direction}"
+            #Adding space before direction field based on input 
+            if @@space_flag
+                puts "#{@x_coordinate},#{@y_coordinate}, #{@direction}"
+            else
+                puts "#{@x_coordinate},#{@y_coordinate},#{@direction}"
+            end
         else
             puts "Inappropriate input"
         end

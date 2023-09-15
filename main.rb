@@ -46,6 +46,30 @@ class Robot
         end
     end
 
+    def left
+        @direction = get_direction(@@directions_arr)
+    end
+
+    def right
+        @direction = get_direction(@@directions_arr.reverse)
+    end
+
+    def move
+        direction_map = {
+          "NORTH" => [0, 1],
+          "SOUTH" => [0, -1],
+          "EAST"  => [1, 0],
+          "WEST"  => [-1, 0]
+        }
+
+        if new_position = direction_map[@direction]
+            new_x, new_y = @x_coordinate + new_position[0], @y_coordinate + new_position[1]
+            if valid_position?(new_x, new_y)
+                @x_coordinate, @y_coordinate = new_x, new_y
+            end
+        end
+    end
+
     def report
         #Checking for valid PLACE command
         if @@can_robot_start && (@x_coordinate && @y_coordinate) && valid_direction?(@direction)
@@ -64,6 +88,10 @@ class Robot
 
     def valid_direction?(direction)
         direction && @@directions_arr.include?(direction)
+    end
+
+    def get_direction(arr)
+        arr[arr.find_index(@direction) - 1]
     end
 end
 

@@ -17,6 +17,7 @@ List any software or dependencies that need to be installed before running the p
 # Example:
 # - Ruby (version 3.0.0)
 # - RSpec (version 3.4.0)
+```
 
 ## Installation
 

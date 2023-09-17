@@ -32,14 +32,13 @@ Example:
 > $ bundle install
 
 ## Usage
-Run the ruby file below command
+Run the ruby file below command and then enter commands one by one.
 > $ ruby main.rb
-And then enter commands one by one.
 
 ## Running Tests:
-Run all RSpec tests with below command
+Run all RSpec tests with below command. You'll see the success and the failure cases
 > $ bundle exec rspec
-You'll see the success and the failure cases
+
 
 
 

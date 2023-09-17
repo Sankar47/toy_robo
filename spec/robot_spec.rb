@@ -3,7 +3,55 @@ require_relative '../robot'
 
 RSpec.describe Robot do
   # Create a subject for testing
-  subject(:robot) { described_class.new }
+  subject(:robot) { Robot.new }
+
+  describe "#place" do
+    it "places the robot at the specified position and direction" do
+      robot.place(["2", "3", "NORTH"])
+      expect(robot.instance_variable_get(:@x_coordinate)).to eq(2)
+      expect(robot.instance_variable_get(:@y_coordinate)).to eq(3)
+      expect(robot.instance_variable_get(:@direction)).to eq("NORTH")
+    end
+
+    it "ignores invalid positions" do
+      robot.place(["6", "5", "EAST"])
+      expect(robot.instance_variable_get(:@x_coordinate)).to be_nil
+      expect(robot.instance_variable_get(:@y_coordinate)).to be_nil
+      expect(robot.instance_variable_get(:@direction)).to be_nil
+    end
+  end
+
+  describe "#move" do
+    it "move the Robot to one step in the same direction" do
+      robot.place([1, 2, "NORTH"])
+      robot.move
+      expect(robot.instance_variable_get(:@direction)).to eq("NORTH")
+      expect(robot.instance_variable_get(:@y_coordinate)).to eq(3)
+    end
+
+    it "Robot won't move when it exeeds table" do
+      robot.place([4, 4, "NORTH"])
+      robot.move
+      expect(robot.instance_variable_get(:@direction)).to eq("NORTH")
+      expect(robot.instance_variable_get(:@y_coordinate)).to eq(4)
+    end
+  end
+
+  describe "#left" do
+    it "changes the Robot's direction to the left" do
+      robot.place([1, 2, "NORTH"])
+      robot.left
+      expect(robot.instance_variable_get(:@direction)).to eq("WEST")
+    end
+  end
+
+  describe "#right" do
+    it "changes the Robot's direction to the right" do
+      robot.place([1, 2, "NORTH"])
+      robot.right
+      expect(robot.instance_variable_get(:@direction)).to eq("EAST")
+    end
+  end
 
   describe '#valid_position?' do
     it 'returns true for valid positions' do
@@ -29,15 +77,15 @@ RSpec.describe Robot do
   describe 'command simulation' do
     it 'simulates a sequence of commands and verifies the final state' do
       allow(robot).to receive(:gets).and_return(
-        'PLACE 1,2,NORTH',  # Place the robot
-        'MOVE',             # Move the robot
-        'LEFT',             # Turn left
-        'MOVE',             # Move again
-        'REPORT',           # Report the position
-        'q'                 # Quit
+        "PLACE 1,2,NORTH\n",  # Place the robot
+        "MOVE\n",             # Move the robot
+        "LEFT\n",             # Turn left
+        "MOVE\n",             # Move again
+        "REPORT\n",           # Report the position
+        "\n"                 # Quit
       )
 
-      robot.commands  # Simulate the commands
+      robot.run  # Simulate the commands
 
       # Verify the final position reported
       expect { robot.report }.to output("0,3,WEST\n").to_stdout
@@ -45,18 +93,18 @@ RSpec.describe Robot do
 
     it 'simulates a sequence of commands with space before direction and verifies the final state' do
         allow(robot).to receive(:gets).and_return(
-          'PLACE 1,2, NORTH',  # Place the robot
-          'MOVE',             # Move the robot
-          'LEFT',             # Turn left
-          'MOVE',             # Move again
-          'REPORT',           # Report the position
-          'q'                 # Quit
+          "PLACE 1,2, NORTH\n",  # Place the robot
+          "MOVE\n",             # Move the robot
+          "LEFT\n",             # Turn left
+          "MOVE\n",             # Move again
+          "REPORT\n",           # Report the position
+          "\n"                 # Quit
         )
   
-        robot.commands  # Simulate the commands
+        robot.run  # Simulate the commands
   
         # Verify the final position reported
         expect { robot.report }.to output("0,3, WEST\n").to_stdout
-      end
+    end
   end
 end

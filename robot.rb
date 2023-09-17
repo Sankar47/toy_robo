@@ -1,39 +1,38 @@
-
 class Robot
-    @@can_robot_start = false
-    @@directions_arr = ["NORTH", "EAST", "SOUTH", "WEST"]
-    @@space_flag = false
+    DIRECTIONS = %w(NORTH EAST SOUTH WEST).freeze
+    DIRECTION_MAP = {
+      "NORTH" => [0, 1],
+      "SOUTH" => [0, -1],
+      "EAST"  => [1, 0],
+      "WEST"  => [-1, 0]
+    }.freeze
+    TABLE_SIZE = [5, 5].freeze
 
     def initialize
         @x_coordinate = nil
         @y_coordinate = nil
         @direction = nil
-        @table_size = [5, 5]
+        @placed = false
+        @space_flag = false
     end
 
-    def commands
+    def run
         robot_command = ""
 
         #Accepting continuous commands
-        while robot_command.downcase != "q"
-            print "Enter a command (type 'q' to quit): "
+        loop do
             robot_command = gets.chomp
+            return if game_over?(robot_command)
             robot_command_split = robot_command.split(' ', 2)
-            @@can_robot_start = true if robot_command_split[0] == "PLACE"
+            @placed = true if robot_command_split[0] == "PLACE"
 
-            if @@can_robot_start
+            if @placed
                 if robot_command_split[0] == "PLACE" && robot_command_split[1]
                     place(robot_command_split[1].split(","))
-                elsif robot_command == "MOVE"
-                    move()
-                elsif robot_command == "LEFT"
-                    left()
-                elsif robot_command == "RIGHT"
-                    right()
-                elsif robot_command == "REPORT"
-                    report()
+                elsif ["MOVE", "LEFT", "RIGHT", "REPORT"].include?(robot_command)
+                    send(robot_command.downcase)
                 else
-                    print "Invalid Command "
+                    #ignore
                 end
             end
         end
@@ -47,30 +46,23 @@ class Robot
 
             #Checking whether input has space before direction field
             if arr[2].strip != arr[2]
-                @@space_flag = true
+                @space_flag = true
             else
-                @@space_flag = false
+                @space_flag = false
             end
         end
     end
 
     def left
-        @direction = get_direction(@@directions_arr)
+        @direction = get_direction(DIRECTIONS)
     end
 
     def right
-        @direction = get_direction(@@directions_arr.reverse)
+        @direction = get_direction(DIRECTIONS.reverse)
     end
 
     def move
-        direction_map = {
-          "NORTH" => [0, 1],
-          "SOUTH" => [0, -1],
-          "EAST"  => [1, 0],
-          "WEST"  => [-1, 0]
-        }
-
-        if new_position = direction_map[@direction]
+        if new_position = DIRECTION_MAP[@direction]
             new_x, new_y = @x_coordinate + new_position[0], @y_coordinate + new_position[1]
             if valid_position?(new_x, new_y)
                 @x_coordinate, @y_coordinate = new_x, new_y
@@ -80,9 +72,9 @@ class Robot
 
     def report
         #Checking for valid PLACE command
-        if @@can_robot_start && (@x_coordinate && @y_coordinate) && valid_direction?(@direction)
+        if @placed && (@x_coordinate && @y_coordinate) && valid_direction?(@direction)
             #Adding space before direction field based on input 
-            if @@space_flag
+            if @space_flag
                 puts "#{@x_coordinate},#{@y_coordinate}, #{@direction}"
             else
                 puts "#{@x_coordinate},#{@y_coordinate},#{@direction}"
@@ -96,14 +88,18 @@ class Robot
 
     def valid_position?(x=nil, y=nil)
         #return true if x and y are inside the table
-        x >= 0 && x < @table_size[0] && y >= 0 && y < @table_size[1]
+        x >= 0 && x < TABLE_SIZE[0] && y >= 0 && y < TABLE_SIZE[1]
     end
 
     def valid_direction?(direction)
-        direction && @@directions_arr.include?(direction)
+        direction && DIRECTIONS.include?(direction)
     end
 
-    def get_direction(arr)
-        arr[arr.find_index(@direction) - 1]
+    def get_direction(_directions)
+      _directions[_directions.find_index(@direction) - 1]
+    end
+
+    def game_over?(command)
+      command.empty?
     end
 end

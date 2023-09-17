@@ -1,2 +1,3 @@
+require './robot'
 robot = Robot.new
-robot.commands
+robot.run
